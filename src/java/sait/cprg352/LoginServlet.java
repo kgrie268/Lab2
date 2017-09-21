@@ -23,25 +23,11 @@ public class LoginServlet extends HttpServlet {
  @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       // processRequest(request, response);
-        // retrieves age from the form
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet LoginServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Login</h1>");
-            out.println("<p>Username:  <input type =\"text\" name=\"age\" value=\" \" ></p>");
-            out.println("<p>Password:  <input type =\"text\" name=\"age\" value=\" \" ></p>");
-            out.println("<button id=\"val\" class=\"val\" name=\"button\">Login</button>");
-            out.println("</body>");
-            out.println("</html>");
-            
-            
-        }
+      String logout= request.getParameter("logout");
+      if(logout!= null && logout.equals("true")){
+        request.setAttribute("errorMessage", "Logged out");  
+      }
+        
     
         getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
             // stop other execution of code
@@ -60,7 +46,41 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String userName = request.getParameter("userName");
+        String passWord = request.getParameter("passWord");
+       
         
+        //request.setAttribute("age2", age);
+        // validation
+        
+       if (userName == null || userName.isEmpty() || passWord== null || userName.isEmpty()) {
+            // set error message
+            request.setAttribute("errorMessage", "Both values are required");
+            
+
+            // forward the request back to index.jsp
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+            // stop other execution of code
+            return;
+        }
+        
+        UserService userClass = new UserService();
+        
+        if(userClass.login(userName, passWord)){
+         //goes to main page
+         request.setAttribute("userName", userName);
+        
+         getServletContext().getRequestDispatcher("/WEB-INF/mainPage.jsp").forward(request, response);
+        }
+        else{
+        request.setAttribute("errorMessage", "Invaild username or password");
+         getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        }
+        
+        
+       
+            // stop other execution of code
+           
     }
 
 }
